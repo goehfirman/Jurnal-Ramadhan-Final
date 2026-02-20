@@ -15,6 +15,7 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
   const [formData, setFormData] = useState<Partial<AmalanRecord>>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [displayDate, setDisplayDate] = useState<{ gregorian: string; hijri: string }>({ gregorian: '', hijri: '' });
+  const [isHonest, setIsHonest] = useState(false);
   
   const actualRamadhanDay = getRamadhanDay();
   const isEditable = currentDay === actualRamadhanDay;
@@ -117,6 +118,7 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
       });
     }
     setStatus('idle');
+    setIsHonest(false);
   }, [record, currentUser, currentDay]);
 
   const handleChange = (field: keyof AmalanRecord, value: any) => {
@@ -428,24 +430,40 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
           </div>
         </div>
 
-        <div className="mt-6 bg-gradient-to-r from-yellow-500/30 to-orange-500/30 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/60 text-sm">EXP Hari Ini</p>
-              <p className="text-3xl font-bold text-yellow-300">{formData.total_exp || 0} EXP</p>
-            </div>
-            <div className="text-right">
-              {status === 'saved' && <span className="text-emerald-400 text-sm">✓ Tersimpan</span>}
+        <div className="mt-6 space-y-4">
+          <div className="bg-gradient-to-r from-yellow-500/30 to-orange-500/30 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">EXP Hari Ini</p>
+                <p className="text-3xl font-bold text-yellow-300">{formData.total_exp || 0} EXP</p>
+              </div>
+              <div className="text-right">
+                {status === 'saved' && <span className="text-emerald-400 text-sm">✓ Tersimpan</span>}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-6">
+          {isEditable && (
+            <label className="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition group">
+              <div className="relative flex items-center mt-1">
+                <input 
+                  type="checkbox" 
+                  checked={isHonest}
+                  onChange={(e) => setIsHonest(e.target.checked)}
+                  className="w-5 h-5 rounded border-white/30 bg-white/10 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 transition cursor-pointer"
+                />
+              </div>
+              <p className="text-sm text-white/80 leading-relaxed group-hover:text-white transition">
+                Bismillah, saya bersaksi bahwa amalan harian ini saya kerjakan dan saya laporkan dengan jujur karena Allah Ta'ala.
+              </p>
+            </label>
+          )}
+
           <button 
             onClick={handleManualSave}
-            disabled={!isEditable || status === 'saving'}
+            disabled={!isEditable || status === 'saving' || !isHonest}
             className={`w-full py-4 font-bold rounded-xl transition transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
-              !isEditable 
+              !isEditable || !isHonest
                 ? 'bg-gray-500/50 text-gray-300 cursor-not-allowed' 
                 : status === 'saving'
                   ? 'bg-yellow-600 text-white cursor-wait'
