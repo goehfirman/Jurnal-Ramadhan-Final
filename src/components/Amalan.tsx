@@ -292,7 +292,7 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
           </div>
 
           <div className="bg-emerald-500/20 rounded-xl p-4">
-            <h3 className="font-bold text-emerald-300 mb-4 flex items-center gap-2">🕌 Sholat Wajib Berjamaah/Munfarid</h3>
+            <h3 className="font-bold text-emerald-300 mb-4 flex items-center gap-2">🕌 Sholat Berjamaah/Munfarid</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {renderSholatRadio('Subuh', 'sholat_subuh', '🌅')}
               {renderSholatRadio('Dzuhur', 'sholat_dzuhur', '☀️')}

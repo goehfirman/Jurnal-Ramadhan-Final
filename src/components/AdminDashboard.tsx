@@ -21,7 +21,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [summaries, setSummaries] = useState<StudentSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [allRecords, setAllRecords] = useState<AmalanRecord[]>([]);
-  const [sortBy, setSortBy] = useState<'exp' | 'class'>('exp');
+  const [sortBy, setSortBy] = useState<'exp' | 'az'>('exp');
   const [selectedClass, setSelectedClass] = useState<string>('all');
 
   const classes = Object.keys(studentsData).sort();
@@ -77,9 +77,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (sortBy === 'exp') {
       return b.totalExp - a.totalExp;
     } else {
-      // Sort by class name first, then by name
-      const classCompare = a.className.localeCompare(b.className);
-      if (classCompare !== 0) return classCompare;
+      // Sort by name A-Z
       return a.name.localeCompare(b.name);
     }
   });
@@ -107,14 +105,18 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
       record.sholat_maghrib ? (record.sholat_maghrib === 'jamaah' ? 'Jamaah' : 'Munfarid') : '-',
       record.sholat_isya ? (record.sholat_isya === 'jamaah' ? 'Jamaah' : 'Munfarid') : '-',
       record.sholat_tarawih ? (record.sholat_tarawih === 'jamaah' ? 'Jamaah' : 'Munfarid') : '-',
+      record.tausiyah_ustadz || '-',
+      record.tausiyah_tema || '-',
       record.quran_pages || 0,
       calculateExp(record)
     ]);
 
     autoTable(doc, {
       startY: 60,
-      head: [['Hari', 'Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya', 'Tarawih', 'Quran (Hal)', 'EXP']],
+      head: [['Hari', 'Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya', 'Tarawih', 'Ustadz', 'Materi', 'Quran', 'EXP']],
       body: tableData,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [234, 179, 8] }, // Yellow-500 color
     });
 
     doc.save(`Laporan_${studentName.replace(/\s+/g, '_')}.pdf`);
@@ -185,10 +187,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 Sort by EXP
               </button>
               <button
-                onClick={() => setSortBy('class')}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${sortBy === 'class' ? 'bg-yellow-500 text-gray-900' : 'text-gray-400 hover:text-white'}`}
+                onClick={() => setSortBy('az')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${sortBy === 'az' ? 'bg-yellow-500 text-gray-900' : 'text-gray-400 hover:text-white'}`}
               >
-                Sort by Kelas
+                Sort A-Z
               </button>
             </div>
             <button 
