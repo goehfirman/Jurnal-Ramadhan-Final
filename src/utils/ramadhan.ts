@@ -1,8 +1,6 @@
 import { AmalanRecord, StudentRank } from '../types';
-import { students, studentsData } from '../data/students';
-
-// LocalStorage Keys
-const STORAGE_KEY_AMALAN = 'amalan_records_v1';
+import { studentsData } from '../data/students';
+import { getSupabase } from '../lib/supabase';
 
 export const calculateExp = (record: Partial<AmalanRecord>): number => {
   let exp = 0;
@@ -58,51 +56,62 @@ export const getRamadhanDay = (): number => {
   return diffDays + 1;
 };
 
-// Helper to get all records from localStorage
-const getLocalRecords = (): AmalanRecord[] => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY_AMALAN);
-    return data ? JSON.parse(data) : [];
-  } catch (e) {
-    console.error("Failed to parse local records", e);
+export const getAllRecords = async (): Promise<AmalanRecord[]> => {
+  const { data, error } = await getSupabase()
+    .from('amalan_records')
+    .select('*');
+  
+  if (error) {
+    console.error('Error fetching all records:', error);
     return [];
   }
-};
-
-// Helper to save all records to localStorage
-const saveLocalRecords = (records: AmalanRecord[]) => {
-  try {
-    localStorage.setItem(STORAGE_KEY_AMALAN, JSON.stringify(records));
-  } catch (e) {
-    console.error("Failed to save local records", e);
-  }
-};
-
-export const getAllRecords = async (): Promise<AmalanRecord[]> => {
-  return getLocalRecords();
+  
+  return data || [];
 };
 
 export const getUserRecords = async (studentName: string): Promise<AmalanRecord[]> => {
-  const records = getLocalRecords();
-  return records.filter(r => r.student_name === studentName);
+  const { data, error } = await getSupabase()
+    .from('amalan_records')
+    .select('*')
+    .eq('student_name', studentName);
+  
+  if (error) {
+    console.error('Error fetching user records:', error);
+    return [];
+  }
+  
+  return data || [];
 };
 
 export const saveRecord = async (record: AmalanRecord) => {
-  const records = getLocalRecords();
-  const index = records.findIndex(r => r.student_name === record.student_name && r.day === record.day);
+  const { error } = await getSupabase()
+    .from('amalan_records')
+    .upsert({
+      ...record,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'student_name,day'
+    });
   
-  if (index >= 0) {
-    records[index] = record;
-  } else {
-    records.push(record);
+  if (error) {
+    console.error('Error saving record:', error);
+    throw error;
   }
-  
-  saveLocalRecords(records);
 };
 
 export const getRecord = async (studentName: string, day: number): Promise<AmalanRecord | undefined> => {
-  const records = getLocalRecords();
-  return records.find(r => r.student_name === studentName && r.day === day);
+  const { data, error } = await getSupabase()
+    .from('amalan_records')
+    .select('*')
+    .eq('student_name', studentName)
+    .eq('day', day)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+    console.error('Error fetching record:', error);
+  }
+  
+  return data || undefined;
 };
 
 export const getTotalExp = async (studentName: string): Promise<number> => {
@@ -111,11 +120,10 @@ export const getTotalExp = async (studentName: string): Promise<number> => {
 };
 
 export const getLeaderboard = async (): Promise<StudentRank[]> => {
-  const records = getLocalRecords();
+  const records = await getAllRecords();
   const expMap = new Map<string, { exp: number, class?: string }>();
   
   // Initialize with 0 for known students
-  // We need to iterate over all classes in studentsData
   Object.entries(studentsData).forEach(([className, classStudents]) => {
     Object.keys(classStudents).forEach(studentName => {
       expMap.set(studentName, { exp: 0, class: className });
@@ -127,7 +135,6 @@ export const getLeaderboard = async (): Promise<StudentRank[]> => {
     const current = expMap.get(r.student_name) || { exp: 0, class: r.student_class };
     const recordExp = calculateExp(r);
     
-    // Update class if it's in the record but not in map (e.g. manual entry)
     if (r.student_class && !current.class) {
       current.class = r.student_class;
     }
