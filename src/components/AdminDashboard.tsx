@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { getAllRecords, calculateExp } from '../utils/ramadhan';
-import { students } from '../data/students';
+import { studentsData } from '../data/students';
 import { AmalanRecord } from '../types';
 
 interface AdminDashboardProps {
@@ -11,6 +11,7 @@ interface AdminDashboardProps {
 
 interface StudentSummary {
   name: string;
+  className: string;
   totalExp: number;
   totalQuranPages: number;
   daysFilled: number;
@@ -20,6 +21,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [summaries, setSummaries] = useState<StudentSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [allRecords, setAllRecords] = useState<AmalanRecord[]>([]);
+  const [sortBy, setSortBy] = useState<'exp' | 'class'>('exp');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
+
+  const classes = Object.keys(studentsData).sort();
 
   useEffect(() => {
     async function fetchData() {
@@ -30,12 +35,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         const summaryMap = new Map<string, StudentSummary>();
 
         // Initialize all students with 0
-        students.forEach(student => {
-          summaryMap.set(student, {
-            name: student,
-            totalExp: 0,
-            totalQuranPages: 0,
-            daysFilled: 0
+        Object.entries(studentsData).forEach(([className, classStudents]) => {
+          Object.keys(classStudents).forEach(studentName => {
+            summaryMap.set(studentName, {
+              name: studentName,
+              className: className,
+              totalExp: 0,
+              totalQuranPages: 0,
+              daysFilled: 0
+            });
           });
         });
 
@@ -49,7 +57,8 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           }
         });
 
-        setSummaries(Array.from(summaryMap.values()).sort((a, b) => b.totalExp - a.totalExp));
+        const summaryList = Array.from(summaryMap.values());
+        setSummaries(summaryList);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -59,6 +68,21 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
     fetchData();
   }, []);
+
+  const filteredSummaries = summaries.filter(s => 
+    selectedClass === 'all' || s.className === selectedClass
+  );
+
+  const sortedSummaries = [...filteredSummaries].sort((a, b) => {
+    if (sortBy === 'exp') {
+      return b.totalExp - a.totalExp;
+    } else {
+      // Sort by class name first, then by name
+      const classCompare = a.className.localeCompare(b.className);
+      if (classCompare !== 0) return classCompare;
+      return a.name.localeCompare(b.name);
+    }
+  });
 
   const downloadIndividualReport = (studentName: string) => {
     const doc = new jsPDF();
@@ -101,15 +125,16 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     
     // Header
     doc.setFontSize(18);
-    doc.text('Laporan Kelas - Petualangan Ramadhan', 14, 22);
+    doc.text(selectedClass === 'all' ? 'Laporan Seluruh Kelas' : `Laporan Kelas ${selectedClass}`, 14, 22);
     doc.setFontSize(12);
-    doc.text(`Total Siswa: ${students.length}`, 14, 32);
+    doc.text(`Total Siswa: ${sortedSummaries.length}`, 14, 32);
     doc.text(`Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 38);
 
     // Table
-    const tableData = summaries.map((s, index) => [
+    const tableData = sortedSummaries.map((s, index) => [
       index + 1,
       s.name,
+      s.className,
       s.daysFilled,
       s.totalQuranPages,
       s.totalExp
@@ -117,11 +142,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
     autoTable(doc, {
       startY: 50,
-      head: [['No', 'Nama Siswa', 'Hari Terisi', 'Total Halaman Quran', 'Total EXP']],
+      head: [['No', 'Nama Siswa', 'Kelas', 'Hari Terisi', 'Total Halaman Quran', 'Total EXP']],
       body: tableData,
     });
 
-    doc.save('Laporan_Kelas_Ramadhan.pdf');
+    doc.save(selectedClass === 'all' ? 'Laporan_Seluruh_Siswa.pdf' : `Laporan_Kelas_${selectedClass.replace(/\s+/g, '_')}.pdf`);
   };
 
   if (loading) {
@@ -140,12 +165,37 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <h1 className="text-3xl font-bold text-yellow-400">Admin Dashboard</h1>
             <p className="text-gray-400">Overview Amalan Siswa</p>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4 items-center">
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
+            >
+              <option value="all">Semua Kelas</option>
+              {classes.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+
+            <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+              <button
+                onClick={() => setSortBy('exp')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${sortBy === 'exp' ? 'bg-yellow-500 text-gray-900' : 'text-gray-400 hover:text-white'}`}
+              >
+                Sort by EXP
+              </button>
+              <button
+                onClick={() => setSortBy('class')}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${sortBy === 'class' ? 'bg-yellow-500 text-gray-900' : 'text-gray-400 hover:text-white'}`}
+              >
+                Sort by Kelas
+              </button>
+            </div>
             <button 
               onClick={downloadClassReport}
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
             >
-              📄 Download Laporan Kelas
+              📄 Download Laporan
             </button>
             <button 
               onClick={onLogout}
@@ -161,8 +211,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
             <table className="w-full text-left">
               <thead className="bg-gray-700 text-gray-300 uppercase text-sm">
                 <tr>
-                  <th className="px-6 py-4">Peringkat</th>
+                  <th className="px-6 py-4">No</th>
                   <th className="px-6 py-4">Nama Siswa</th>
+                  <th className="px-6 py-4">Kelas</th>
                   <th className="px-6 py-4 text-center">Hari Terisi</th>
                   <th className="px-6 py-4 text-center">Halaman Quran</th>
                   <th className="px-6 py-4 text-center">Total EXP</th>
@@ -170,10 +221,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {summaries.map((student, index) => (
+                {sortedSummaries.map((student, index) => (
                   <tr key={student.name} className="hover:bg-gray-700/50 transition">
                     <td className="px-6 py-4 font-medium text-gray-400">#{index + 1}</td>
                     <td className="px-6 py-4 font-medium text-white">{student.name}</td>
+                    <td className="px-6 py-4 text-gray-400 text-sm">{student.className}</td>
                     <td className="px-6 py-4 text-center text-blue-300">{student.daysFilled} / 30</td>
                     <td className="px-6 py-4 text-center text-amber-300">{student.totalQuranPages}</td>
                     <td className="px-6 py-4 text-center font-bold text-yellow-400">{student.totalExp}</td>
