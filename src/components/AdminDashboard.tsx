@@ -86,15 +86,42 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     const doc = new jsPDF();
     const studentRecords = allRecords.filter(r => r.student_name === studentName).sort((a, b) => a.day - b.day);
     const summary = summaries.find(s => s.name === studentName);
+    const totalPuasa = studentRecords.filter(r => r.puasa).length;
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Header
-    doc.setFontSize(18);
-    doc.text('Laporan Amalan Ramadhan', 14, 22);
-    doc.setFontSize(12);
-    doc.text(`Nama Siswa: ${studentName}`, 14, 32);
-    doc.text(`Total EXP: ${summary?.totalExp || 0}`, 14, 38);
-    doc.text(`Total Halaman Quran: ${summary?.totalQuranPages || 0}`, 14, 44);
-    doc.text(`Hari Terisi: ${summary?.daysFilled || 0} / 30`, 14, 50);
+    // 1. Logo (Center)
+    try {
+      const logoUrl = "https://i.ibb.co.com/trFqzRQ/LOGO-PEKAYON-09.png";
+      // Using a small size for the logo
+      doc.addImage(logoUrl, 'PNG', (pageWidth / 2) - 10, 10, 20, 20);
+    } catch (e) {
+      console.warn("Logo could not be loaded in PDF:", e);
+    }
+
+    // 2. Title (Center)
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Laporan Jurnal Ramadhan 1447 H', pageWidth / 2, 40, { align: 'center' });
+    doc.text('SDN Pekayon 09', pageWidth / 2, 47, { align: 'center' });
+
+    // 3. Total EXP (Top Right - Large)
+    doc.setFontSize(32);
+    doc.setTextColor(234, 179, 8); // Yellow-500
+    doc.text(`${summary?.totalExp || 0}`, pageWidth - 14, 25, { align: 'right' });
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text('TOTAL EXP', pageWidth - 14, 32, { align: 'right' });
+
+    // 4. Student Info (Left)
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    let infoY = 60;
+    doc.text(`Nama Siswa: ${studentName}`, 14, infoY);
+    doc.text(`Kelas: ${summary?.className || '-'}`, 14, infoY + 7);
+    doc.text(`Hari Terisi: ${summary?.daysFilled || 0} / 30`, 14, infoY + 14);
+    doc.text(`Total Puasa: ${totalPuasa} Hari`, 14, infoY + 21);
+    doc.text(`Total Halaman Quran: ${summary?.totalQuranPages || 0}`, 14, infoY + 28);
 
     // Table
     const tableData = studentRecords.map(record => [
@@ -112,7 +139,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     ]);
 
     autoTable(doc, {
-      startY: 60,
+      startY: 100,
       head: [['Hari', 'Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya', 'Tarawih', 'Ustadz', 'Materi', 'Quran', 'EXP']],
       body: tableData,
       styles: { fontSize: 8 },
