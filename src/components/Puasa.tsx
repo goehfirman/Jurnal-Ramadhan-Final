@@ -8,6 +8,7 @@ export default function Puasa() {
     { id: 'hukum', label: '⚖️ Hukum & Rukun' },
     { id: 'syarat', label: '📋 Syarat & Sunnah' },
     { id: 'niat', label: '🤲 Niat & Doa' },
+    { id: 'sahur', label: '🥣 Sahur' },
     { id: 'buka', label: '🍽️ Berbuka Puasa' },
     { id: 'boleh', label: '🔓 Rukhsah' },
     { id: 'keutamaan', label: '🌟 Keutamaan' },
@@ -149,6 +150,60 @@ export default function Puasa() {
                 <p className="text-white/80 text-sm">"Aku niat berpuasa esok hari untuk menunaikan fardhu bulan Ramadhan tahun ini karena Allah Ta'ala"</p>
               </div>
               <p className="text-sm text-white/60 mt-3 text-center">⏰ Dibaca pada malam hari sebelum fajar</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'sahur' && (
+        <div className="card-gradient rounded-3xl p-6 border border-white/20 animate-slide-in">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-2xl">🥣</div>
+            <h2 className="text-2xl font-bold text-yellow-400">Keutamaan Makan Sahur</h2>
+          </div>
+          <div className="space-y-6 text-white/90">
+            <p>Makan sahur sering kali terasa berat karena kita harus bangun di sepertiga malam terakhir. Namun, di balik rasa kantuk tersebut, Islam menempatkan sahur bukan sekadar sebagai bekal fisik untuk menahan lapar, melainkan sebagai ibadah yang bertabur pahala dan keberkahan.</p>
+            
+            <div className="grid gap-4">
+              <div className="bg-blue-500/20 rounded-xl p-5 border border-blue-500/30">
+                <h3 className="font-bold text-blue-300 text-lg mb-2">1. Terdapat Keberkahan di Dalamnya</h3>
+                <p className="text-sm mb-3">Sahur adalah makanan yang diberkahi. Keberkahan di sini mencakup kebaikan di dunia (seperti energi untuk beraktivitas) dan kebaikan di akhirat (pahala karena mengikuti sunnah).</p>
+                <div className="bg-white/10 rounded-lg p-3">
+                  <p className="font-amiri text-xl text-yellow-200 mb-1 text-center">تَسَحَّرُوا فَإِنَّ فِي السَّحُورِ بَرَكَةً</p>
+                  <p className="text-xs text-white/70 italic text-center">"Sahurlah kalian, karena sesungguhnya pada sahur itu terdapat keberkahan." (HR. Bukhari no. 1923 dan Muslim no. 1095)</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-500/20 rounded-xl p-5 border border-emerald-500/30">
+                <h3 className="font-bold text-emerald-300 text-lg mb-2">2. Pembeda dengan Puasa Ahlul Kitab</h3>
+                <p className="text-sm mb-3">Makan sahur adalah syiar umat Islam yang membedakan ibadah puasa kita dengan puasa umat-umat terdahulu (Yahudi dan Nasrani).</p>
+                <div className="bg-white/10 rounded-lg p-3">
+                  <p className="font-amiri text-xl text-yellow-200 mb-1 text-center">فَصْلُ مَا بَيْنَ صِيَامِنَا وَصِيَامِ أَهْلِ الْكِتَابِ أَكْلَةُ السَّحَرِ</p>
+                  <p className="text-xs text-white/70 italic text-center">"Perbedaan antara puasa kita dan puasa Ahli Kitab adalah makan sahur." (HR. Muslim no. 1096)</p>
+                </div>
+              </div>
+
+              <div className="bg-purple-500/20 rounded-xl p-5 border border-purple-500/30">
+                <h3 className="font-bold text-purple-300 text-lg mb-2">3. Mendapat Shalawat dari Allah dan Malaikat</h3>
+                <p className="text-sm mb-3">Allah SWT akan memberikan rahmat-Nya, dan para malaikat akan memohonkan ampunan bagi orang-orang yang bangun untuk makan sahur.</p>
+                <div className="bg-white/10 rounded-lg p-3 text-center">
+                  <p className="text-xs text-white/70 italic">"Sahur itu makanan yang barakah, janganlah kalian meninggalkannya walaupun hanya meminum seteguk air, karena Allah dan malaikat-Nya bershalawat kepada orang-orang yang sahur." (HR. Ahmad)</p>
+                </div>
+              </div>
+
+              <div className="bg-amber-500/20 rounded-xl p-5 border border-amber-500/30">
+                <h3 className="font-bold text-amber-300 text-lg mb-2">4. Waktu Mustajab untuk Berdoa</h3>
+                <p className="text-sm mb-3">Waktu sahur bertepatan dengan sepertiga malam terakhir. Ini adalah waktu di mana doa-doa diijabah dan ampunan Allah turun ke langit dunia.</p>
+                <div className="bg-white/10 rounded-lg p-3 text-center">
+                  <p className="font-amiri text-xl text-yellow-200 mb-1">وَبِالْأَسْحَارِ هُمْ يَسْتَغْفِرُونَ</p>
+                  <p className="text-xs text-white/70 italic">"Dan selalu memohonkan ampunan di waktu sahur (sebelum fajar)." (QS. Adz-Dzariyat: 18)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-500/10 rounded-xl p-4 border border-yellow-500/30">
+              <h4 className="font-bold text-yellow-400 mb-1">💡 Kesimpulan</h4>
+              <p className="text-sm">Meskipun hanya dengan seteguk air atau sebutir kurma, usahakanlah untuk tetap bangun dan melaksanakan sahur. Niatkan aktivitas tersebut murni untuk mengikuti sunnah Rasulullah ﷺ agar bernilai pahala yang berlipat ganda.</p>
             </div>
           </div>
         </div>
