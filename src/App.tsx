@@ -166,8 +166,15 @@ export default function App() {
       <div className="h-full overflow-auto scroll-hidden gradient-bg text-white relative">
         <div id="stars" className="fixed inset-0 pointer-events-none z-0"></div>
         <div className="fixed top-8 right-8 w-20 h-20 rounded-full bg-gradient-to-br from-yellow-100 to-yellow-300 shadow-2xl animate-float z-10 opacity-90"></div>
-        <div className="relative z-20">
-          <Login onLogin={handleLogin} />
+        <div className="relative z-20 flex flex-col min-h-screen">
+          <div className="flex-1 flex items-center justify-center">
+            <Login onLogin={handleLogin} />
+          </div>
+          <footer className="p-8 text-center">
+            <p className="text-white/40 text-sm">
+              Created by: <span className="text-yellow-400/60 font-medium">Teguh Firmansyah Apriliana</span> - <span className="text-emerald-400/60">@goehfirmaan</span>
+            </p>
+          </footer>
         </div>
       </div>
     );
@@ -227,6 +234,12 @@ export default function App() {
 
           {activeSection === 'inquiry' && <Inquiry currentUser={currentUser} />}
         </main>
+
+        <footer className="max-w-5xl mx-auto p-8 text-center border-t border-white/10 mt-8">
+          <p className="text-white/40 text-sm">
+            Created by: <span className="text-yellow-400/60 font-medium">Teguh Firmansyah Apriliana</span> - <span className="text-emerald-400/60">@goehfirmaan</span>
+          </p>
+        </footer>
       </div>
     </div>
   );

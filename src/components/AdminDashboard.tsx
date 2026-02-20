@@ -273,6 +273,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
           </div>
         </div>
       </div>
+      <footer className="max-w-7xl mx-auto p-8 text-center border-t border-gray-800 mt-8">
+        <p className="text-gray-500 text-sm">
+          Created by: <span className="text-yellow-400/60 font-medium">Teguh Firmansyah Apriliana</span> - <span className="text-emerald-400/60">@goehfirmaan</span>
+        </p>
+      </footer>
     </div>
   );
 }
