@@ -15,10 +15,73 @@ export default function Waktu({ currentDate }: WaktuProps) {
     isya: '--:--'
   });
 
+  const [heading, setHeading] = useState<number | null>(null);
+  const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
+  const [isSupported, setIsSupported] = useState<boolean>(true);
+
   useEffect(() => {
     const times = getJakartaPrayerTimes(new Date());
     setPrayerTimes(times);
+
+    if (!window.DeviceOrientationEvent) {
+      setIsSupported(false);
+      return;
+    }
+
+    const isIOS = typeof (DeviceOrientationEvent as any).requestPermission === 'function';
+    
+    if (!isIOS) {
+      setPermissionGranted(true);
+      startCompass();
+    }
+
+    return () => {
+      stopCompass();
+    };
   }, []);
+
+  const startCompass = () => {
+    window.addEventListener('deviceorientationabsolute', handleOrientation as any, true);
+    window.addEventListener('deviceorientation', handleOrientation, true);
+  };
+
+  const stopCompass = () => {
+    window.removeEventListener('deviceorientationabsolute', handleOrientation as any, true);
+    window.removeEventListener('deviceorientation', handleOrientation, true);
+  };
+
+  const handleOrientation = (event: DeviceOrientationEvent) => {
+    let compassHeading = null;
+    
+    if ((event as any).webkitCompassHeading) {
+      // iOS
+      compassHeading = (event as any).webkitCompassHeading;
+    } else if (event.absolute && event.alpha !== null) {
+      // Android
+      compassHeading = 360 - event.alpha;
+    }
+
+    if (compassHeading !== null) {
+      setHeading(compassHeading);
+    }
+  };
+
+  const requestPermission = async () => {
+    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      try {
+        const permissionState = await (DeviceOrientationEvent as any).requestPermission();
+        if (permissionState === 'granted') {
+          setPermissionGranted(true);
+          startCompass();
+        } else {
+          setPermissionGranted(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setPermissionGranted(false);
+      }
+    }
+  };
 
   return (
     <section className="space-y-6 animate-slide-in">
@@ -69,7 +132,10 @@ export default function Waktu({ currentDate }: WaktuProps) {
         <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl p-5 mb-6">
           <h3 className="font-bold text-emerald-300 mb-4 text-center flex items-center justify-center gap-2">🧭 Kompas Kiblat</h3>
           <div className="relative w-48 h-48 mx-auto">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-emerald-500/50 shadow-lg">
+            <div 
+              className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-emerald-500/50 shadow-lg transition-transform duration-100 ease-out"
+              style={{ transform: `rotate(${heading ? -heading : 0}deg)` }}
+            >
               <div className="absolute inset-2 rounded-full border-2 border-white/20">
                 <span className="absolute top-1 left-1/2 -translate-x-1/2 text-xs font-bold text-red-400">U</span>
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-bold text-white/60">S</span>
@@ -80,25 +146,41 @@ export default function Waktu({ currentDate }: WaktuProps) {
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
                 <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
               </svg>
+              
+              <div className="absolute inset-0 flex items-center justify-center" style={{ transform: 'rotate(295deg)' }}>
+                <svg className="w-32 h-32" viewBox="0 0 100 100">
+                  <polygon points="50,10 45,45 50,40 55,45" fill="#10b981" stroke="#10b981" strokeWidth="1" />
+                  <polygon points="50,90 45,55 50,60 55,55" fill="#4b5563" stroke="#4b5563" strokeWidth="1" />
+                  <rect x="45" y="5" width="10" height="10" fill="#fbbf24" rx="1" />
+                  <text x="50" y="13" fontSize="6" fill="#1e3a5f" textAnchor="middle" fontWeight="bold">🕋</text>
+                </svg>
+              </div>
             </div>
             
-            <div className="compass-needle absolute inset-0 flex items-center justify-center" style={{ transform: 'rotate(295deg)' }}>
-              <svg className="w-32 h-32" viewBox="0 0 100 100">
-                <polygon points="50,10 45,45 50,40 55,45" fill="#10b981" stroke="#10b981" strokeWidth="1" />
-                <polygon points="50,90 45,55 50,60 55,55" fill="#4b5563" stroke="#4b5563" strokeWidth="1" />
-                <rect x="45" y="5" width="10" height="10" fill="#fbbf24" rx="1" />
-                <text x="50" y="13" fontSize="6" fill="#1e3a5f" textAnchor="middle" fontWeight="bold">🕋</text>
-              </svg>
-            </div>
-            
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-4 h-4 rounded-full bg-white shadow-lg"></div>
             </div>
           </div>
           <div className="text-center mt-4">
             <p className="text-white/70 text-sm">Arah Kiblat dari Jakarta</p>
             <p className="text-emerald-300 font-bold text-lg">295° Barat Laut</p>
-            <p className="text-white/50 text-xs mt-1">*Gunakan kompas fisik untuk akurasi lebih baik</p>
+            
+            {!isSupported ? (
+              <p className="text-red-400 text-xs mt-2">Perangkat tidak mendukung sensor kompas.</p>
+            ) : permissionGranted === false ? (
+              <p className="text-red-400 text-xs mt-2">Izin sensor kompas ditolak.</p>
+            ) : permissionGranted === null && typeof (window as any).DeviceOrientationEvent?.requestPermission === 'function' ? (
+              <button 
+                onClick={requestPermission}
+                className="mt-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-full transition cursor-pointer"
+              >
+                Aktifkan Kompas
+              </button>
+            ) : heading !== null ? (
+              <p className="text-emerald-400 text-xs mt-2">Kompas aktif (Akurasi bergantung pada sensor HP)</p>
+            ) : (
+              <p className="text-yellow-400 text-xs mt-2">Mencari sinyal kompas...</p>
+            )}
           </div>
         </div>
 
