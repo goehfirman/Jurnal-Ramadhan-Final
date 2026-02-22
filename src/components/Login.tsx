@@ -6,8 +6,6 @@ interface LoginProps {
 }
 
 const CLASSES = [
-  'Kelas 1A', 'Kelas 1B', 
-  'Kelas 2A', 'Kelas 2B', 'Kelas 2C', 
   'Kelas 3', 
   'Kelas 4A', 'Kelas 4B', 'Kelas 4C', 
   'Kelas 5A', 'Kelas 5B', 'Kelas 5C', 
