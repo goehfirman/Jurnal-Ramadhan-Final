@@ -100,6 +100,7 @@ export const studentsData: Record<string, Record<string, string>> = {
     "RANI RATNA MUTIARA": "3771",
     "RAYSHAKA ZEIN OZORA": "3588",
     "RENATA PUTRY CAROLINE": "3589",
+    "Resky Catur Aryanto": "3485",
     "RISYA PUTRI AYU": "3592",
     "SULTAN RADITYA NADHIF": "3598"
   },
@@ -217,6 +218,7 @@ export const studentsData: Record<string, Record<string, string>> = {
     "Hikaru Syafiq Rizaldi": "3607",
     "KEYZA BELFHANIA": "3625",
     "KHAIRANI LAKEISHA": "3448",
+    "KHANSA KHAIRUNNISA": "1234",
     "KHANZA MAYRANI PUTRI": "3852",
     "MELINDA HANIFA APRILIANI": "3614",
     "MOHAMAD REZA": "3451",
