@@ -43,6 +43,7 @@ export const studentsData: Record<string, Record<string, string>> = {
     "ANINDITA NABILA ZAHRA": "3631",
     "ARDEN DIARTA ANARYA": "3632",
     "ARETHA DIANA ARIANI": "3633",
+    "ARKAN RIZIEQ": "1234",
     "ARYA VIRENDRA SHAFWAN": "3634",
     "ASHIMAH NUR SYAQILLA": "3635",
     "ATHAR RIFKY YUDHISTIRA": "3636",
