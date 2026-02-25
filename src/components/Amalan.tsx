@@ -18,7 +18,7 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
   const [isHonest, setIsHonest] = useState(false);
   
   const actualRamadhanDay = getRamadhanDay();
-  const isEditable = currentDay <= actualRamadhanDay;
+  const isEditable = currentDay === actualRamadhanDay || currentDay === actualRamadhanDay - 1;
 
   // Refs to hold latest state for auto-save
   const formDataRef = React.useRef(formData);
@@ -259,7 +259,11 @@ export default function Amalan({ currentUser, currentClass, currentDay, record, 
             <div className="text-2xl">🔒</div>
             <div>
               <p className="font-bold text-red-300">Form Terkunci</p>
-              <p className="text-sm text-white/80">Kamu belum bisa mengisi amalan untuk hari yang akan datang. Maksimal sampai hari ini (Hari ke-{actualRamadhanDay}).</p>
+              <p className="text-sm text-white/80">
+                {currentDay > actualRamadhanDay 
+                  ? `Kamu belum bisa mengisi amalan untuk hari yang akan datang. Maksimal sampai hari ini (Hari ke-${actualRamadhanDay}).`
+                  : `Waktu pengisian untuk hari ini sudah ditutup. Kamu hanya bisa mengisi amalan untuk hari ini dan 1 hari sebelumnya.`}
+              </p>
             </div>
           </div>
         )}
