@@ -57,16 +57,35 @@ export const getRamadhanDay = (): number => {
 };
 
 export const getAllRecords = async (): Promise<AmalanRecord[]> => {
-  const { data, error } = await getSupabase()
-    .from('amalan_records')
-    .select('*');
-  
-  if (error) {
-    console.error('Error fetching all records:', error);
-    return [];
+  let allData: AmalanRecord[] = [];
+  let page = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await getSupabase()
+      .from('amalan_records')
+      .select('*')
+      .range(page * pageSize, (page + 1) * pageSize - 1);
+    
+    if (error) {
+      console.error('Error fetching all records:', error);
+      break;
+    }
+    
+    if (data && data.length > 0) {
+      allData = [...allData, ...data];
+      if (data.length < pageSize) {
+        hasMore = false;
+      } else {
+        page++;
+      }
+    } else {
+      hasMore = false;
+    }
   }
   
-  return data || [];
+  return allData;
 };
 
 export const getUserRecords = async (studentName: string): Promise<AmalanRecord[]> => {
