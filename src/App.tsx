@@ -96,28 +96,10 @@ export default function App() {
         const leaderboard = await getLeaderboard();
         
         // School Rank
-        const mySchoolRankIndex = leaderboard.findIndex(r => r.name === currentUser);
-        setSchoolRank(mySchoolRankIndex >= 0 ? mySchoolRankIndex + 1 : '-');
+        setSchoolRank('?');
 
         // Class Rank
-        if (currentClass) {
-          const classLeaderboard = leaderboard.filter(r => r.class === currentClass);
-          const myClassRankIndex = classLeaderboard.findIndex(r => r.name === currentUser);
-          setClassRank(myClassRankIndex >= 0 ? myClassRankIndex + 1 : '-');
-        } else {
-          // Fallback if class not set (e.g. old login), try to find from leaderboard data if available
-          const userRankData = leaderboard.find(r => r.name === currentUser);
-          if (userRankData?.class) {
-             const classLeaderboard = leaderboard.filter(r => r.class === userRankData.class);
-             const myClassRankIndex = classLeaderboard.findIndex(r => r.name === currentUser);
-             setClassRank(myClassRankIndex >= 0 ? myClassRankIndex + 1 : '-');
-             // Also update currentClass state if missing
-             setCurrentClass(userRankData.class);
-             localStorage.setItem('currentClass', userRankData.class);
-          } else {
-             setClassRank('-');
-          }
-        }
+        setClassRank('?');
 
         // Calculate total quran pages
         const userRecords = await getUserRecords(currentUser);

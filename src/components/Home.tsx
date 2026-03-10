@@ -40,7 +40,7 @@ export default function Home({ day, exp, quranPages, schoolRank, classRank, clas
             <div className="text-3xl mb-2">🏆</div>
             <div className="flex flex-col items-center">
               <div className="text-lg font-bold text-blue-300">
-                #{classRank} <span className="text-xs font-normal text-white/60">({className || 'Kelas'})</span>
+                #{classRank} <span className="text-xs font-normal text-white/60">(Kelas ***)</span>
               </div>
               <div className="text-xs text-white/50">
                 #{schoolRank} (Sekolah)

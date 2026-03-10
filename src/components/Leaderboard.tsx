@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StudentRank } from '../types';
-import { getLeaderboard } from '../utils/ramadhan';
+import { getLeaderboard, maskName } from '../utils/ramadhan';
 
 interface LeaderboardProps {
   currentUser: string;
@@ -69,8 +69,8 @@ export default function Leaderboard({ currentUser }: LeaderboardProps) {
               🥈
             </div>
             <div className="bg-gray-400/30 rounded-t-xl p-3 h-20 flex flex-col justify-end">
-              <p className="font-bold text-sm text-white truncate w-20 sm:w-24 mx-auto">{filteredRankings[1]?.name.split(' ')[0] || '-'}</p>
-              <p className="text-xs text-gray-300">{filteredRankings[1]?.exp || 0} EXP</p>
+              <p className="font-bold text-sm text-white truncate w-20 sm:w-24 mx-auto">{maskName(filteredRankings[1]?.name)}</p>
+              <p className="text-xs text-gray-300">**** EXP</p>
             </div>
           </div>
 
@@ -80,8 +80,8 @@ export default function Leaderboard({ currentUser }: LeaderboardProps) {
               🥇
             </div>
             <div className="bg-yellow-500/30 rounded-t-xl p-3 h-28 flex flex-col justify-end">
-              <p className="font-bold text-sm text-white truncate w-24 sm:w-28 mx-auto">{filteredRankings[0]?.name.split(' ')[0] || '-'}</p>
-              <p className="text-xs text-yellow-300">{filteredRankings[0]?.exp || 0} EXP</p>
+              <p className="font-bold text-sm text-white truncate w-24 sm:w-28 mx-auto">{maskName(filteredRankings[0]?.name)}</p>
+              <p className="text-xs text-yellow-300">**** EXP</p>
             </div>
           </div>
 
@@ -91,8 +91,8 @@ export default function Leaderboard({ currentUser }: LeaderboardProps) {
               🥉
             </div>
             <div className="bg-amber-700/30 rounded-t-xl p-3 h-16 flex flex-col justify-end">
-              <p className="font-bold text-sm text-white truncate w-20 sm:w-24 mx-auto">{filteredRankings[2]?.name.split(' ')[0] || '-'}</p>
-              <p className="text-xs text-amber-300">{filteredRankings[2]?.exp || 0} EXP</p>
+              <p className="font-bold text-sm text-white truncate w-20 sm:w-24 mx-auto">{maskName(filteredRankings[2]?.name)}</p>
+              <p className="text-xs text-amber-300">**** EXP</p>
             </div>
           </div>
         </div>
@@ -114,13 +114,13 @@ export default function Leaderboard({ currentUser }: LeaderboardProps) {
                     {medal || (index + 1)}
                   </div>
                   <div className={`col-span-7 truncate ${isCurrentUser ? 'text-emerald-300 font-bold' : ''}`}>
-                    {student.name}
+                    {maskName(student.name)}
                     {selectedClass === 'Semua Kelas' && student.class && (
-                      <span className="block text-[10px] text-white/40 font-normal">{student.class}</span>
+                      <span className="block text-[10px] text-white/40 font-normal">Kelas ***</span>
                     )}
                   </div>
                   <div className="col-span-3 text-right font-bold text-yellow-300">
-                    {student.exp}
+                    ****
                   </div>
                 </div>
               );
@@ -128,23 +128,6 @@ export default function Leaderboard({ currentUser }: LeaderboardProps) {
             {filteredRankings.length === 0 && (
               <div className="p-4 text-center text-white/40">Belum ada data untuk kelas ini</div>
             )}
-          </div>
-        </div>
-
-        <div className="mt-4 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-xl p-4 border border-emerald-500/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-gray-900">
-                {myRankIndex >= 0 ? myRankIndex + 1 : '-'}
-              </div>
-              <div>
-                <p className="font-bold text-emerald-300">{currentUser}</p>
-                <p className="text-xs text-white/60">Peringkatmu ({selectedClass})</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-yellow-300">{myRank?.exp || 0} EXP</p>
-            </div>
           </div>
         </div>
       </div>

@@ -176,6 +176,13 @@ export const getDateFromRamadhanDay = (day: number): Date => {
   return targetDate;
 };
 
+export const maskName = (name: string | undefined): string => {
+  if (!name) return '-';
+  const trimmedName = name.trim();
+  if (trimmedName.length <= 1) return trimmedName;
+  return '***' + trimmedName.charAt(trimmedName.length - 1);
+};
+
 export const convertToHijri = (date: Date): string => {
   const anchorDate = new Date(2026, 1, 19); // 19 Feb 2026 = 1 Ramadhan
   anchorDate.setHours(0, 0, 0, 0);
