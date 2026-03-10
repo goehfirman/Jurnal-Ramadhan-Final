@@ -34,7 +34,7 @@ export default function Navbar({ currentUser, totalExp, activeSection, onNavigat
             />
             <div>
               <h1 className="font-bold text-yellow-400">Petualangan Ramadhan</h1>
-              <p className="text-xs text-white/70">{maskName(currentUser)}</p>
+              <p className="text-xs text-white/70">{currentUser}</p>
               <p className="text-xs text-amber-300/80 font-medium">{currentDate}</p>
             </div>
           </div>
